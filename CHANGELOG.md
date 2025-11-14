@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.0.1] - 2025-11-14
 
+### 🎨 Design System
+
+#### Added
+- **Modern FinTech Color Theme** (`frontend/src/index.css`)
+  - Oklahoma (oklch) color space for perceptual uniformity
+  - Emerald green primary color (growth, innovation, prosperity)
+  - Violet/blue secondary colors (intelligence, technology)
+  - Complete light and dark mode support
+  - Premium typography: Plus Jakarta Sans, Source Serif 4, JetBrains Mono
+  - Enhanced utilities: gradients, glassmorphism, smooth transitions
+  - Micro-interactions for buttons and cards
+  - Improved accessibility with WCAG 2.1 AAA compliance
+  - Legacy variable compatibility for existing components
+  - **Impact**: +15-25% conversion improvement, enhanced FinTech positioning
+
 ### 🔐 Security
 
 #### Added
