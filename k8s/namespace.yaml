@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aicfo
+  labels:
+    app: ai-cfo-suite
+    environment: production

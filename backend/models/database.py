@@ -1,9 +1,77 @@
-from sqlalchemy import Column, String, Text, Boolean, DateTime, JSON, Integer
+from sqlalchemy import Column, String, Text, Boolean, DateTime, JSON, Integer, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from datetime import datetime
+import enum
 
 Base = declarative_base()
+
+
+class UserRole(str, enum.Enum):
+    """User roles"""
+    ADMIN = "admin"
+    USER = "user"
+    VIEWER = "viewer"
+
+
+class User(Base):
+    """User model for authentication and authorization"""
+    __tablename__ = "users"
+
+    id = Column(String, primary_key=True)
+    email = Column(String, unique=True, nullable=False, index=True)
+    hashed_password = Column(String, nullable=False)
+    full_name = Column(String, nullable=False)
+
+    # Role & Status
+    role = Column(String, default=UserRole.USER)
+    is_active = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
+    is_verified = Column(Boolean, default=False)
+
+    # Profile
+    company = Column(String, nullable=True)
+    department = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+
+    # Preferences
+    preferred_language = Column(String, default="fr")
+    preferred_jurisdiction = Column(String, default="CA")
+
+    # API Usage
+    api_key = Column(String, unique=True, nullable=True)
+    request_count = Column(Integer, default=0)
+    last_login = Column(DateTime, nullable=True)
+
+    # Timestamps
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    def to_dict(self, include_sensitive=False):
+        """Convert to dictionary"""
+        data = {
+            "id": self.id,
+            "email": self.email,
+            "full_name": self.full_name,
+            "role": self.role,
+            "is_active": self.is_active,
+            "is_admin": self.is_admin,
+            "is_verified": self.is_verified,
+            "company": self.company,
+            "department": self.department,
+            "phone": self.phone,
+            "preferred_language": self.preferred_language,
+            "preferred_jurisdiction": self.preferred_jurisdiction,
+            "request_count": self.request_count,
+            "last_login": self.last_login.isoformat() if self.last_login else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+
+        if include_sensitive:
+            data["api_key"] = self.api_key
+
+        return data
 
 
 class AgentConfig(Base):

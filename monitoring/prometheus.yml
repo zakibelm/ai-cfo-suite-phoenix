@@ -1,0 +1,96 @@
+# Prometheus Configuration for AI CFO Suite Phoenix
+# Scrapes metrics from backend, Nginx, and infrastructure
+
+global:
+  scrape_interval: 15s  # How often to scrape targets
+  evaluation_interval: 15s  # How often to evaluate rules
+  external_labels:
+    cluster: 'aicfo-production'
+    env: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # FastAPI Backend Metrics
+  - job_name: 'backend'
+    metrics_path: '/api/v1/monitoring/metrics'
+    static_configs:
+      - targets: ['backend:8000']
+        labels:
+          service: 'backend'
+          component: 'api'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # PostgreSQL Exporter
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          service: 'postgres'
+          component: 'database'
+
+  # Redis Exporter
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          service: 'redis'
+          component: 'cache'
+
+  # Qdrant Metrics
+  - job_name: 'qdrant'
+    static_configs:
+      - targets: ['qdrant:6333']
+        labels:
+          service: 'qdrant'
+          component: 'vectordb'
+    metrics_path: '/metrics'
+
+  # Nginx Exporter
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+        labels:
+          service: 'nginx'
+          component: 'proxy'
+
+  # Node Exporter (system metrics)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'node'
+          component: 'system'
+
+  # cAdvisor (container metrics)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'cadvisor'
+          component: 'containers'
+
+# Remote write configuration (optional - for long-term storage)
+# remote_write:
+#   - url: "https://prometheus-remote-write-endpoint.com/api/v1/write"
+#     basic_auth:
+#       username: "user"
+#       password: "password"
